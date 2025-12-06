@@ -1,0 +1,64 @@
+<!-- ========================================= -->
+<!-- templates/liked_songs_content.html -->
+<!-- ========================================= -->
+<header class="hero">
+  <div id="hero-inner">
+    <div style="display:flex;gap:24px;align-items:flex-end">
+      <div style="width:232px;height:232px;background:linear-gradient(135deg,#450af5,#c4efd9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:80px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">💚</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:8px">Playlist</div>
+        <h1 style="font-size:96px;font-weight:900;margin:0 0 24px 0">Liked Songs</h1>
+        <div style="display:flex;gap:8px;align-items:center;color:var(--muted)">
+          <span style="font-weight:700;color:#fff">{{ liked_count }} songs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="content">
+  <div class="tracks">
+    <div class="tracks-head">
+      <div>#</div>
+      <div>TITLE</div>
+      <div>ALBUM</div>
+      <div></div>
+      <div></div>
+      <div>⏱</div>
+    </div>
+    
+    {% if liked_count > 0 %}
+      {% for t in liked_tracks %}
+      <div class="track-row" data-id="{{ t.id }}">
+        <div class="track-index">{{ loop.index }}</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="track-cover" style="background:{{ t.gradient }};cursor:pointer">{{ t.cover }}</div>
+          <div>
+            <div class="track-title" style="cursor:pointer">{{ t.title }}</div>
+            <div class="track-artist">{{ t.artist }}</div>
+          </div>
+        </div>
+        <div class="meta">{{ t.album }}</div>
+        <div class="track-actions">
+          <button class="like-btn" style="color: #1db954;">💚</button>
+          <button class="queue-add">+</button>
+          <button class="add-to-pl">⋯</button>
+        </div>
+        <div style="text-align:right">
+          {% if t.duration %}
+            {{ (t.duration // 60) }}:{% if (t.duration % 60) < 10 %}0{% endif %}{{ t.duration % 60 }}
+          {% else %}
+            0:00
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="text-align: center; padding: 60px 20px; color: var(--muted);">
+        <div style="font-size: 48px; margin-bottom: 16px;">💚</div>
+        <h3>No liked songs yet</h3>
+        <p>Like some songs to see them here</p>
+      </div>
+    {% endif %}
+  </div>
+</section>

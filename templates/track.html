@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding:20px">
+  <h1>{{ track.title }}</h1>
+  <p>Artist: {{ track.artist }}</p>
+  <p>Album: {{ track.album }}</p>
+  <p>Duration: {% if track.duration %}{{ track.duration // 60 }}:{% if (track.duration % 60) < 10 %}0{% endif %}{{ track.duration % 60 }}{% else %}0:00{% endif %}</p>
+  <audio controls src="{{ track.media }}"></audio>
+</div>
+{% endblock %}

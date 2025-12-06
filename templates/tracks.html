@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding:20px">
+  <h1>Tracks — page {{ items.page }}</h1>
+  <table style="width:100%;border-collapse:collapse">
+    <thead><tr><th>#</th><th>Title</th><th>Artist</th><th>Album</th><th>Duration</th></tr></thead>
+    <tbody>
+      {% for t in items.items %}
+      <tr>
+        <td>{{ loop.index + (items.page-1)*items.per_page }}</td>
+        <td><a href="{{ url_for('main.track_view', track_id=t.id) }}">{{ t.title }}</a></td>
+        <td>{{ t.artist }}</td>
+        <td>{{ t.album }}</td>
+        <td>{% if t.duration %}{{ t.duration // 60 }}:{% if (t.duration % 60) < 10 %}0{% endif %}{{ t.duration % 60 }}{% else %}0:00{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="margin-top:12px">
+    {% if items.has_prev %}
+      <a href="{{ url_for('main.tracks_page', page=items.page-1) }}">Prev</a>
+    {% endif %}
+    {% if items.has_next %}
+      <a href="{{ url_for('main.tracks_page', page=items.page+1) }}">Next</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

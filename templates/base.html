@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Spotify Clone{% endblock %}</title>
+
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+</head>
+<body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for cat, msg in messages %}
+          <div class="flash {{cat}}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="app">
+    <audio id="audio" preload="metadata"></audio>
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">NoxMusic</div>
+      
+      <nav class="nav">
+        <a href="{{ url_for('main.index') }}" class="nav-btn {% if request.endpoint == 'main.index' %}active{% endif %}">
+          <span style="font-size:20px">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="{{ url_for('main.search_page') }}" class="nav-btn {% if request.endpoint == 'main.search_page' %}active{% endif %}">
+          <span style="font-size:20px">🔍</span>
+          <span>Search</span>
+        </a>
+        <a href="{{ url_for('main.library_page') }}" class="nav-btn {% if request.endpoint == 'main.library_page' %}active{% endif %}">
+          <span style="font-size:20px">📚</span>
+          <span>Your Library</span>
+        </a>
+      </nav>
+      
+      <nav class="nav" style="margin-top:24px">
+        {% if current_user and current_user.is_admin %}
+        <a href="{{ url_for('main.admin_dashboard') }}" class="nav-btn">
+          <span style="font-size:20px">⚙️</span>
+          <span>Admin Panel</span>
+        </a>
+        {% endif %}
+        <a href="{{ url_for('auth.profile') }}" class="nav-btn">
+          <span style="font-size:20px">👤</span>
+          <span>Profile</span>
+        </a>
+      </nav>
+      
+      <div class="playlists">
+        <div class="h">Your Playlists</div>
+        <div id="playlist-list">
+          <a href="{{ url_for('main.liked_songs_page') }}" class="nav-btn" style="display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-radius: 8px; color: var(--muted); text-decoration: none;">
+            <span style="font-size:20px">💚</span>
+            <span>Liked Songs</span>
+          </a>
+          {% if current_user %}
+            <div id="user-playlists">
+              <!-- Плейлисты пользователя будут загружены через JavaScript -->
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- User info section -->
+      <div class="user-info" style="margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,0.1)">
+        {% if current_user %}
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:24px">{{ current_user.avatar }}</div>
+            <div style="flex:1">
+              <div style="font-weight:500">{{ current_user.username }}</div>
+              <div style="font-size:12px;color:var(--muted)">
+                {% if current_user.is_admin %}👑 Admin{% else %}User{% endif %}
+              </div>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" style="color:var(--muted);font-size:18px" title="Logout">🚪</a>
+          </div>
+        {% else %}
+          <div style="text-align:center">
+            <a href="{{ url_for('auth.login') }}" style="color:var(--primary);display:block;padding:8px 12px;border:1px solid var(--primary);border-radius:20px;margin-bottom:8px">Login / Register</a>
+            <a href="{{ url_for('main.admin_login_page') }}" style="color:gold;font-size:12px">Admin Login</a>
+          </div>
+        {% endif %}
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Player Footer -->
+    <footer class="player">
+      <div class="player-left">
+        <div id="now-playing">No track playing</div>
+      </div>
+      
+      <div class="player-center">
+        <div class="controls">
+          <button id="shuffle-btn" style="opacity:0.6" title="Shuffle">🔀</button>
+          <button id="prev-btn" title="Previous">⏮</button>
+          <button id="play-btn" class="play" title="Play">▶</button>
+          <button id="next-btn" title="Next">⏭</button>
+          <button id="repeat-btn" style="opacity:0.6" title="Repeat">🔁</button>
+        </div>
+        
+        <div class="seek">
+          <span id="time-current">0:00</span>
+          <div id="progress-bar" class="progress-bar">
+            <div id="progress" class="progress"></div>
+          </div>
+          <span id="time-duration">0:00</span>
+        </div>
+      </div>
+      
+      <div class="player-right">
+        <button id="mute-btn" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px" title="Mute">🔊</button>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7" title="Volume" />
+      </div>
+    </footer>
+  </div>
+
+  {% if tracks is defined and playlists is defined %}
+  <script>
+    window.SERVER_DATA = {
+      tracks: {{ tracks | tojson | safe }},
+      playlists: {{ playlists | tojson | safe }},
+      genres: {{ genres | tojson | safe if genres is defined else [] | tojson | safe }}
+    };
+  </script>
+  {% endif %}
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!-- ========================================= -->
+<!-- templates/library_content.html -->
+<!-- ========================================= -->
+<header class="hero">
+  <div id="hero-inner">
+    <div style="display:flex;gap:24px;align-items:center">
+      <div style="font-size: 72px;">{{ user.avatar }}</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:8px">Profile</div>
+        <h1 style="font-size:72px;font-weight:900;margin:0 0 16px 0">{{ user.username }}</h1>
+        <div style="display:flex;gap:16px;align-items:center;color:var(--muted)">
+          <span>{{ playlists_count }} playlists</span>
+          <span>•</span>
+          <span>{{ liked_count }} liked songs</span>
+          {% if user.is_admin %}
+          <span style="background: gold; color: black; padding: 2px 8px; border-radius: 12px; font-size: 12px;">ADMIN</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="content">
+  <div class="content-header">
+    <h2>Your Playlists</h2>
+    <button onclick="createNewPlaylist()" style="margin-left: auto; padding: 8px 16px; background: var(--accent); border: none; border-radius: 20px; color: white; cursor: pointer; font-weight: 600;">
+      + New Playlist
+    </button>
+  </div>
+  
+  {% if playlists_count > 0 %}
+  <div class="grid" style="margin-bottom: 40px;">
+    {% for p in playlists %}
+    <div class="tile" data-playlist-id="{{ p.id }}" style="cursor:pointer">
+      <div class="cover" style="background:{{ p.gradient }}">{{ p.cover }}</div>
+      <div>
+        <div style="font-weight:700">{{ p.name }}</div>
+        <div class="meta">{{ p.trackCount }} songs</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 40px 20px; color: var(--muted);">
+    <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+    <h3>No playlists yet</h3>
+    <p>Create your first playlist to get started</p>
+  </div>
+  {% endif %}
+  
+  {% if liked_count > 0 %}
+  <div style="margin-bottom: 40px;">
+    <h3 style="margin-bottom: 16px;">Liked Songs</h3>
+    <div class="tracks">
+      <div class="tracks-head">
+        <div>#</div>
+        <div>TITLE</div>
+        <div>ALBUM</div>
+        <div></div>
+        <div></div>
+        <div>⏱</div>
+      </div>
+      {% for t in liked_tracks[:10] %}
+      <div class="track-row" data-id="{{ t.id }}">
+        <div class="track-index">{{ loop.index }}</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="track-cover" style="background:{{ t.gradient }};cursor:pointer">{{ t.cover }}</div>
+          <div>
+            <div class="track-title" style="cursor:pointer">{{ t.title }}</div>
+            <div class="track-artist">{{ t.artist }}</div>
+          </div>
+        </div>
+        <div class="meta">{{ t.album }}</div>
+        <div class="track-actions">
+          <button class="like-btn">💚</button>
+          <button class="queue-add">+</button>
+        </div>
+        <div style="text-align:right">
+          {% if t.duration %}
+            {{ (t.duration // 60) }}:{% if (t.duration % 60) < 10 %}0{% endif %}{{ t.duration % 60 }}
+          {% else %}
+            0:00
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>

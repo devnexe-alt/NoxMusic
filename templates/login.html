@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:400px;margin:60px auto;padding:30px;background:rgba(255,255,255,0.02);border-radius:8px">
+  <h2>Login</h2>
+  
+  <form method="post">
+    <div style="margin-bottom:16px">
+      <label style="display:block;margin-bottom:6px;color:var(--muted)">Username</label>
+      <input type="text" name="username" placeholder="Enter username" 
+             style="width:100%;padding:10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff">
+    </div>
+    
+    <div style="margin-bottom:20px">
+      <label style="display:block;margin-bottom:6px;color:var(--muted)">Admin API Key (optional)</label>
+      <input type="password" name="api_key" placeholder="Enter admin API key for admin access" 
+             style="width:100%;padding:10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff">
+      <small style="color:var(--muted);font-size:12px">Leave empty for regular user login</small>
+    </div>
+    
+    <div style="display:flex;gap:10px;align-items:center">
+      <button type="submit" style="padding:10px 20px;border-radius:6px;background:var(--primary);border:none;color:white;cursor:pointer">
+        Login
+      </button>
+      <a href="{{ url_for('main.index') }}" style="color:var(--muted)">Cancel</a>
+      <a href="{{ url_for('auth.register') }}" style="margin-left:auto;color:var(--primary)">Register</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

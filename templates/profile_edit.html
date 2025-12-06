@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto; padding: 30px; background: rgba(255,255,255,0.02); border-radius: 8px;">
+  <h2 style="margin-bottom: 24px;">Edit Profile</h2>
+  
+  <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+    <div>
+      <label style="display: block; margin-bottom: 8px; color: var(--muted); font-size: 14px;">Username</label>
+      <input type="text" name="username" value="{{ user.username }}" required
+             style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 16px;">
+    </div>
+    
+    <div>
+      <label style="display: block; margin-bottom: 8px; color: var(--muted); font-size: 14px;">Email</label>
+      <input type="email" name="email" value="{{ user.email or '' }}"
+             style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 16px;">
+    </div>
+    
+    <div>
+      <label style="display: block; margin-bottom: 8px; color: var(--muted); font-size: 14px;">Avatar Emoji</label>
+      <input type="text" name="avatar" value="{{ user.avatar }}" maxlength="2"
+             style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 24px; text-align: center;">
+      <div style="margin-top: 8px; color: var(--muted); font-size: 12px;">
+        Enter one or two emoji characters
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 12px; margin-top: 16px;">
+      <button type="submit" style="padding: 12px 24px; background: var(--accent); border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; flex: 1;">
+        Save Changes
+      </button>
+      <a href="{{ url_for('auth.profile') }}" style="padding: 12px 24px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; text-decoration: none; font-weight: 600; text-align: center;">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

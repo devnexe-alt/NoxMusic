@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header class="hero">
+  <div id="hero-inner">
+    <h1>Search</h1>
+    <div style="margin-top: 24px;">
+      <form method="get" action="{{ url_for('main.search_page') }}">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ query }}" 
+          placeholder="Artists, songs, playlists, or genres" 
+          style="width: 100%; max-width: 500px; padding: 16px; border-radius: 24px; border: none; background: rgba(255,255,255,0.1); color: white; font-size: 16px; outline: none;"
+          autofocus
+        >
+        <button type="submit" style="display: none;">Search</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<section class="content">
+  {% if query %}
+    <div class="content-header">
+      <h2>Results for "{{ query }}"</h2>
+      <div style="color: var(--muted); font-size: 14px;">
+        {{ tracks_count }} tracks • {{ playlists_count }} playlists • {{ genres_count }} genres
+      </div>
+    </div>
+    
+    {% if tracks_count > 0 %}
+    <div style="margin-bottom: 40px;">
+      <h3 style="margin-bottom: 16px;">Tracks</h3>
+      <div class="tracks">
+        <div class="tracks-head">
+          <div>#</div>
+          <div>TITLE</div>
+          <div>ALBUM</div>
+          <div></div>
+          <div></div>
+          <div>⏱</div>
+        </div>
+        {% for t in tracks %}
+        <div class="track-row" data-id="{{ t.id }}">
+          <div class="track-index">{{ loop.index }}</div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="track-cover" style="background:{{ t.gradient }};cursor:pointer" onclick="playTrack({{ t.id }})">{{ t.cover }}</div>
+            <div>
+              <div class="track-title" style="cursor:pointer" onclick="playTrack({{ t.id }})">{{ t.title }}</div>
+              <div class="track-artist">{{ t.artist }}</div>
+            </div>
+          </div>
+          <div class="meta">{{ t.album }}</div>
+          <div class="track-actions">
+            <button class="like-btn" onclick="toggleLike({{ t.id }})">🤍</button>
+            <button class="queue-add" onclick="addToQueue({{ t.id }})">+</button>
+          </div>
+          <div style="text-align:right">
+            {% if t.duration %}
+              {{ (t.duration // 60) }}:{% if (t.duration % 60) < 10 %}0{% endif %}{{ t.duration % 60 }}
+            {% else %}
+              0:00
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if playlists_count > 0 %}
+    <div style="margin-bottom: 40px;">
+      <h3 style="margin-bottom: 16px;">Playlists</h3>
+      <div class="grid">
+        {% for p in playlists %}
+        <div class="tile" onclick="loadPlaylist({{ p.id }})" style="cursor:pointer">
+          <div class="cover" style="background:{{ p.gradient }}">{{ p.cover }}</div>
+          <div>
+            <div style="font-weight:700">{{ p.name }}</div>
+            <div class="meta">{{ p.trackCount }} songs</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if genres_count > 0 %}
+    <div style="margin-bottom: 40px;">
+      <h3 style="margin-bottom: 16px;">Genres</h3>
+      <div class="grid">
+        {% for g in genres %}
+        <a href="{{ url_for('main.genre_view', genre_id=g.id) }}" class="tile" style="text-decoration: none;">
+          <div class="cover" style="background:{{ g.gradient }}">{{ g.cover }}</div>
+          <div>
+            <div style="font-weight:700">{{ g.name }}</div>
+            <div class="meta">Genre</div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if tracks_count == 0 and playlists_count == 0 and genres_count == 0 %}
+    <div style="text-align: center; padding: 60px 20px; color: var(--muted);">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+      <h3>No results found</h3>
+      <p>Try searching for something else</p>
+    </div>
+    {% endif %}
+    
+  {% else %}
+    <div style="text-align: center; padding: 60px 20px;">
+      <div style="font-size: 48px; margin-bottom: 16px; color: var(--accent);">🔍</div>
+      <h3>Search for music</h3>
+      <p style="color: var(--muted);">Find your favorite tracks, playlists, and genres</p>
+    </div>
+  {% endif %}
+</section>
+
+<script>
+function playTrack(trackId) {
+  fetch(`/api/tracks/${trackId}/play`, { method: 'POST' })
+    .then(() => {
+      window.location.href = `/track/${trackId}`;
+    });
+}
+
+async function toggleLike(trackId) {
+  const res = await fetch(`/api/tracks/${trackId}/like`, { method: 'POST' });
+  if (res.ok) {
+    const data = await res.json();
+    const btn = document.querySelector(`button[onclick="toggleLike(${trackId})"]`);
+    if (btn) {
+      btn.textContent = data.liked ? '💚' : '🤍';
+    }
+  }
+}
+
+function addToQueue(trackId) {
+  fetch(`/api/queue/add/${trackId}`, { method: 'POST' })
+    .then(() => {
+      alert('Added to queue');
+    });
+}
+
+function loadPlaylist(playlistId) {
+  window.location.href = `/playlist/${playlistId}`;
+}
+</script>
+{% endblock %}

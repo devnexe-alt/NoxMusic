@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding: 20px;">
+  <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px;">
+    <div style="font-size: 72px;">{{ user.avatar }}</div>
+    <div>
+      <h1 style="font-size: 48px; font-weight: 900; margin: 0 0 8px 0;">{{ user.username }}</h1>
+      <div style="display: flex; gap: 16px;">
+        <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px;">
+          <div style="font-size: 12px; color: var(--muted);">Member since</div>
+          <div style="font-weight: 600;">{{ user.created_at.strftime('%b %d, %Y') }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 16px; margin-top: 32px;">
+    <a href="{{ url_for('auth.profile_edit') }}" style="padding: 12px 24px; background: var(--accent); border-radius: 24px; color: white; text-decoration: none; font-weight: 600;">
+      Edit Profile
+    </a>
+    <a href="{{ url_for('auth.logout') }}" style="padding: 12px 24px; background: rgba(255,255,255,0.1); border-radius: 24px; color: white; text-decoration: none; font-weight: 600;">
+      Logout
+    </a>
+  </div>
+</div>
+
+<script>
+// Обновить статус навигации
+document.addEventListener('DOMContentLoaded', () => {
+  const profileBtn = document.querySelector('a[href="{{ url_for("auth.profile") }}"]');
+  if (profileBtn) {
+    profileBtn.classList.add('active');
+  }
+});
+</script>
+{% endblock %}
